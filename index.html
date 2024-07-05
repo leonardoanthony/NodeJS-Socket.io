@@ -3,46 +3,169 @@
   <head>
     <title>Socket.IO chat</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
     <style>
-      body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
-      #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
-      #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
-      #input:focus { outline: none; }
-      #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
+      *{
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "JetBrains Mono", monospace;
 
-      #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages > li { padding: 0.5rem 1rem; }
-      #messages > li:nth-child(odd) { background: #efefef; }
+      }
+
+      html, body{
+        height: 100%;
+        background-color: #eee;
+      }
+
+
+      /* .main{
+        display: none;
+      } */
+
+      .login{
+        
+        width: 300px;
+        height: 300px;
+        padding: 0 1em;
+        background-color: white;
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        border-radius: 1em;
+      }
+
+      .login input[name='nome'], .login input[type='submit'], #form input, #form button{
+        height: 36px;
+        border-radius: .5em;
+        border: none;
+      }
+      
+      
+      .login input[name='nome']{
+        margin-bottom: 1em;
+        border: 2px solid #ccc;
+        padding: 0 1em;
+      }
+
+      .login input[type='submit'], #form button{
+        background-color: #388e3c;
+        color: #fff;
+        font-weight: bold;
+        
+      }
+
+      .wrapper{
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+      }
+
+      .main{
+        display: none;
+        width: 100%;
+        height: 100%;
+      }
+
+      .main #form{
+        background-color: #777;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        padding: 0 1em;
+        gap: 1em;
+        
+      }
+
+      #form input{flex: 4; padding: 0 1em;}
+      #form button{flex: 1;}
+
     </style>
   </head>
   <body>
-    <ul id="messages"></ul>
-    <form id="form" action="">
-      <input id="input" autocomplete="off" /><button>Send</button>
-    </form>
+
+    <div class="wrapper">
+      <div class="login">
+        <input class="form-control" type="text" name="nome" placeholder="Nome" >
+        <input onclick="logar(event)" class="btn btn-primary" type="submit" value="Logar">
+      </div>
+    </div>
+
+    <div class="main">
+      <ul id="messages"></ul>
+      <form id="form" action="">
+        <input id="input" autocomplete="off" />
+        <button>Send</button>
+      </form>
+    </div>
+
+
+
+
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        var socket = io();
 
-var messages = document.getElementById('messages');
-var form = document.getElementById('form');
-var input = document.getElementById('input');
+      
+      var socket = io();
 
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            if (input.value) {
-                socket.emit('chat message', input.value);
-                input.value = '';
-            }
-        });
 
-        socket.on('chat message', function(msg) {
-        var item = document.createElement('li');
-        item.textContent = msg;
-        messages.appendChild(item);
-            window.scrollTo(0, document.body.scrollHeight);
-        });
+
+      var form = document.getElementById('form');
+      var messages = document.getElementById('messages');
+      var input = document.getElementById('input');
+      var login = document.querySelector('.login');
+      var main = document.querySelector('.main');
+
+
+      function logar(e){
+        e.preventDefault();
+        const nome = document.querySelector("[name='nome']").value;
+        socket.emit('login_name', nome);
+
+        fecharCardLogin();
+      }
+
+      function fecharCardLogin(){
+        main.style.display = 'block';
+        login.style.display = 'none';
+      }
+
+      socket.on('login_name', (msg) => {
+        alert(msg);
+      })
+
+
+
+
+
+
+      
+      
+      
+      
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    if (input.value) {
+                        socket.emit('chat message', input.value);
+                        input.value = '';
+                    }
+                });
+
+                socket.on('chat message', function(msg) {
+                var item = document.createElement('li');
+                  item.textContent = msg;
+                  messages.appendChild(item);
+                      window.scrollTo(0, document.body.scrollHeight);
+                  });
       </script>
   </body>
 </html>
